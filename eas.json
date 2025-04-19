@@ -1,18 +1,29 @@
 {
   "cli": {
-    "version": ">= 16.3.2",
-    "appVersionSource": "remote"
+    "version": ">= 2.0.0"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDebug -Pkotlin.version=1.8.20"
+      },
+      "ios": {
+        "simulator": true
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "android": {
+        "buildType": "app-bundle"
+      }
     }
   },
   "submit": {

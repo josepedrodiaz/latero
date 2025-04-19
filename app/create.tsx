@@ -99,16 +99,17 @@ export default function CreateMessage() {
 
   const onChange = (event: any, selectedDate?: Date) => {
     if (Platform.OS === 'web') return;
-
+  
     if (event.type === 'dismissed') {
       setShowPicker(false);
       setIsPickingTime(false);
       return;
     }
-
+  
     if (!selectedDate) return;
-
+  
     if (!isPickingTime) {
+      // Elegimos fecha
       const newDate = new Date(
         selectedDate.getFullYear(),
         selectedDate.getMonth(),
@@ -117,8 +118,21 @@ export default function CreateMessage() {
         date.getMinutes()
       );
       setDate(newDate);
+  
+      // Guardamos que vamos a elegir hora
       setIsPickingTime(true);
+  
+      // Cerramos picker de fecha
+      setShowPicker(false);
+  
+      // Esperamos un poquito para abrir picker de hora
+      setTimeout(() => {
+        if (isPickingTime) { // Solo si todavía estábamos esperando hora
+          setShowPicker(true);
+        }
+      }, 300);
     } else {
+      // Elegimos hora
       const newDate = new Date(
         date.getFullYear(),
         date.getMonth(),
@@ -127,10 +141,13 @@ export default function CreateMessage() {
         selectedDate.getMinutes()
       );
       setDate(newDate);
+  
+      // Terminamos el flujo
       setIsPickingTime(false);
       setShowPicker(false);
     }
   };
+  
 
   function formatDateForInput(date: Date) {
     return date.toISOString().slice(0, 16);
@@ -220,7 +237,6 @@ export default function CreateMessage() {
             />
           </View>
         )}
-        {/* Mostrar fecha/hora seleccionada */}
         <Text style={styles.selectedDate}>
           📅 Scheduled for: {formatDisplayDate(date)}
         </Text>
