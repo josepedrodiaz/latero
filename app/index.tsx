@@ -1,6 +1,8 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import strings from '../utils/strings'; // Tu sistema de multilanguage
+import { Ionicons } from '@expo/vector-icons';
+
 
 export default function Home() {
   const router = useRouter();
@@ -10,9 +12,10 @@ export default function Home() {
       <Text style={styles.title}>Latero</Text>
       <Text style={styles.subtitle}>{strings.splashSubtitle}</Text>
 
-      <TouchableOpacity style={styles.button} onPress={() => router.push('/create')}>
-        <Text style={styles.buttonText}>{strings.newReminder}</Text>
+      <TouchableOpacity style={styles.fabButton} onPress={() => router.push('/create')}>
+        <Ionicons name="add" size={36} color="white" />
       </TouchableOpacity>
+
     </View>
   );
 }
@@ -46,5 +49,21 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 18,
+  },
+  fabButton: {
+    position: 'absolute',
+    bottom: 40,
+    right: 30,
+    backgroundColor: '#1E40AF',
+    borderRadius: 30,
+    width: 60,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5, // para sombra en Android
+    shadowColor: '#000', // para sombra en iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3.5,
   },
 });
