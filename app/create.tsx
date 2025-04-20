@@ -3,11 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native
 import { Audio } from 'expo-av';
 import { useRouter } from 'expo-router';
 import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import strings from '../utils/strings';
 
-const initialDate = new Date(Date.now() + 5 * 60 * 1000); // 5 minutos más tarde
+const initialDate = new Date(Date.now() + 5 * 60 * 1000);
 
 export default function CreateMessage() {
   const router = useRouter();
@@ -15,15 +16,26 @@ export default function CreateMessage() {
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [date, setDate] = useState(initialDate);
-  const [showPicker, setShowPicker] = useState(false);
+  const [pickerMode, setPickerMode] = useState<'date' | 'time' | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [isPickingTime, setIsPickingTime] = useState(false);
 
   useEffect(() => {
     (async () => {
       await Audio.requestPermissionsAsync();
     })();
   }, []);
+
+  const saveReminder = async (reminder: any) => {
+    try {
+      const existingRemindersString = await AsyncStorage.getItem('reminders');
+      const existingReminders = existingRemindersString ? JSON.parse(existingRemindersString) : [];
+      existingReminders.push(reminder);
+      await AsyncStorage.setItem('reminders', JSON.stringify(existingReminders));
+    } catch (error) {
+      console.error('Failed to save reminder:', error);
+    }
+  };
 
   const startRecording = async () => {
     try {
@@ -94,60 +106,52 @@ export default function CreateMessage() {
       trigger: finalDate,
     });
 
+    await saveReminder({
+      id: Date.now(),
+      uri: recordedUri,
+      date: finalDate,
+    });
+
     router.replace('/');
   };
 
   const onChange = (event: any, selectedDate?: Date) => {
     if (Platform.OS === 'web') return;
-  
+
     if (event.type === 'dismissed') {
-      setShowPicker(false);
-      setIsPickingTime(false);
+      setShowDatePicker(false);
+      setPickerMode(null);
       return;
     }
-  
-    if (!selectedDate) return;
-  
-    if (!isPickingTime) {
-      // Elegimos fecha
-      const newDate = new Date(
-        selectedDate.getFullYear(),
-        selectedDate.getMonth(),
-        selectedDate.getDate(),
-        date.getHours(),
-        date.getMinutes()
-      );
-      setDate(newDate);
-  
-      // Guardamos que vamos a elegir hora
-      setIsPickingTime(true);
-  
-      // Cerramos picker de fecha
-      setShowPicker(false);
-  
-      // Esperamos un poquito para abrir picker de hora
-      setTimeout(() => {
-        if (isPickingTime) { // Solo si todavía estábamos esperando hora
-          setShowPicker(true);
+
+    if (event.type === 'set') {
+      if (selectedDate) {
+        if (pickerMode === 'date') {
+          const updatedDate = new Date(
+            selectedDate.getFullYear(),
+            selectedDate.getMonth(),
+            selectedDate.getDate(),
+            date.getHours(),
+            date.getMinutes()
+          );
+          setDate(updatedDate);
         }
-      }, 300);
-    } else {
-      // Elegimos hora
-      const newDate = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate(),
-        selectedDate.getHours(),
-        selectedDate.getMinutes()
-      );
-      setDate(newDate);
-  
-      // Terminamos el flujo
-      setIsPickingTime(false);
-      setShowPicker(false);
+
+        if (pickerMode === 'time') {
+          const updatedDate = new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate(),
+            selectedDate.getHours(),
+            selectedDate.getMinutes()
+          );
+          setDate(updatedDate);
+        }
+      }
+      setShowDatePicker(false);
+      setPickerMode(null);
     }
   };
-  
 
   function formatDateForInput(date: Date) {
     return date.toISOString().slice(0, 16);
@@ -205,16 +209,25 @@ export default function CreateMessage() {
         {Platform.OS !== 'web' ? (
           <>
             <TouchableOpacity style={styles.fullWidthButton} onPress={() => {
-              setShowPicker(true);
-              setIsPickingTime(false);
+              setPickerMode('date');
+              setShowDatePicker(true);
             }}>
               <Ionicons name="calendar" size={24} color="white" />
-              <Text style={styles.buttonText}>Pick date and time</Text>
+              <Text style={styles.buttonText}>Pick Date</Text>
             </TouchableOpacity>
-            {showPicker && (
+
+            <TouchableOpacity style={styles.fullWidthButton} onPress={() => {
+              setPickerMode('time');
+              setShowDatePicker(true);
+            }}>
+              <Ionicons name="time" size={24} color="white" />
+              <Text style={styles.buttonText}>Pick Time</Text>
+            </TouchableOpacity>
+
+            {showDatePicker && pickerMode && (
               <DateTimePicker
                 value={date}
-                mode={isPickingTime ? 'time' : 'date'}
+                mode={pickerMode}
                 display="default"
                 onChange={onChange}
                 minimumDate={new Date()}

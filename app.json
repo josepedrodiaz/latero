@@ -13,10 +13,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#0A1F44"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
       },
-      "package": "com.josepedrodiaz.latero"
+      "package": "com.josepedrodiaz.latero",
+      "notification": {
+        "icon": "./assets/notification-icon.png",
+        "color": "#1E40AF"
+      }
     },
     "web": {
       "bundler": "metro",
