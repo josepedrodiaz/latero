@@ -1,8 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import strings from '../utils/strings'; // Tu sistema de multilanguage
 import { Ionicons } from '@expo/vector-icons';
-
+import strings from '../utils/strings';
 
 export default function Home() {
   const router = useRouter();
@@ -12,10 +11,15 @@ export default function Home() {
       <Text style={styles.title}>Latero</Text>
       <Text style={styles.subtitle}>{strings.splashSubtitle}</Text>
 
-      <TouchableOpacity style={styles.fabButton} onPress={() => router.push('/create')}>
-        <Ionicons name="add" size={36} color="white" />
-      </TouchableOpacity>
+      <View style={styles.buttonsRow}>
+        <TouchableOpacity style={styles.fabButton} onPress={() => router.push('/create')}>
+          <Ionicons name="add" size={32} color="white" />
+        </TouchableOpacity>
 
+        <TouchableOpacity style={styles.fabButton} onPress={() => router.push('/notifications')}>
+          <Ionicons name="notifications-outline" size={28} color="white" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -40,28 +44,20 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     textAlign: 'center',
   },
-  button: {
-    backgroundColor: '#4F8EF7',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
+  buttonsRow: {
+    flexDirection: 'row',
+    gap: 20,
   },
   fabButton: {
-    position: 'absolute',
-    bottom: 40,
-    right: 30,
     backgroundColor: '#1E40AF',
+    padding: 15,
     borderRadius: 30,
     width: 60,
     height: 60,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 5, // para sombra en Android
-    shadowColor: '#000', // para sombra en iOS
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3.5,

@@ -7,9 +7,9 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import strings from '../utils/strings';
 
-const initialDate = new Date(Date.now() + 5 * 60 * 1000); // 5 minutos más tarde
+const initialDate = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
 
-export default function CreateMessage() {
+export default function CreateMessage() {  // << --- ACA ESTA LA EXPORTACION DEFAULT
   const router = useRouter();
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
@@ -109,7 +109,6 @@ export default function CreateMessage() {
     if (!selectedDate) return;
   
     if (!isPickingTime) {
-      // Elegimos fecha
       const newDate = new Date(
         selectedDate.getFullYear(),
         selectedDate.getMonth(),
@@ -119,20 +118,11 @@ export default function CreateMessage() {
       );
       setDate(newDate);
   
-      // Guardamos que vamos a elegir hora
-      setIsPickingTime(true);
-  
-      // Cerramos picker de fecha
-      setShowPicker(false);
-  
-      // Esperamos un poquito para abrir picker de hora
       setTimeout(() => {
-        if (isPickingTime) { // Solo si todavía estábamos esperando hora
-          setShowPicker(true);
-        }
-      }, 300);
+        setIsPickingTime(true);
+        setShowPicker(true);
+      }, 200);
     } else {
-      // Elegimos hora
       const newDate = new Date(
         date.getFullYear(),
         date.getMonth(),
@@ -142,12 +132,10 @@ export default function CreateMessage() {
       );
       setDate(newDate);
   
-      // Terminamos el flujo
       setIsPickingTime(false);
       setShowPicker(false);
     }
   };
-  
 
   function formatDateForInput(date: Date) {
     return date.toISOString().slice(0, 16);
