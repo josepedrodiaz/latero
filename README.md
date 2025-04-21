@@ -132,4 +132,4 @@ When you schedule a reminder:
 
 ## 📌 License
 
-Latero is a private / open-source project (to be defined).
+Latero is an open-source project.
